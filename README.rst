@@ -1,5 +1,5 @@
 wifi-ap-force
-----
+-------------
 
 Wifi provides a command line wrapper for iwlist and /etc/network/interfaces
 that makes it easier to connect the WiFi networks from the command line.  The
