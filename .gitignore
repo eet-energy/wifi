@@ -6,3 +6,5 @@ docs/_build
 tmp/
 .coverage
 htmlcov
+.idea/
+
