@@ -57,6 +57,7 @@ setup(
     author_email='rockymeza@gmail.com',
     description=__doc__,
     long_description='\n\n'.join([read('README.rst'), read('CHANGES.rst')]),
+    url="https://github.com/eet-energy/wifi/",
     packages=['wifi'],
     entry_points=entry_points,
     test_suite='tests',
