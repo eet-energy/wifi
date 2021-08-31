@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-from setuptools import setup
 import os
 import sys
+
+from setuptools import setup
 
 __doc__ = """
 Command line tool and library wrappers around iwlist and
@@ -19,7 +20,7 @@ install_requires = [
 ]
 try:
     import argparse
-except:
+except ImportError:
     install_requires.append('argparse')
 
 version = '1.0.0'
@@ -50,9 +51,9 @@ if should_install_cli:
         print("Not installing bash completion because of lack of permissions.")
 
 setup(
-    name='wifi',
+    name='wifi-ap-force',
     version=version,
-    author='Rocky Meza, Gavin Wahl',
+    author='Rocky Meza, Gavin Wahl, EET',
     author_email='rockymeza@gmail.com',
     description=__doc__,
     long_description='\n\n'.join([read('README.rst'), read('CHANGES.rst')]),
@@ -71,6 +72,9 @@ setup(
         "Programming Language :: Python :: 2.6",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.3",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.8",
     ],
     data_files=data_files
 )
