@@ -23,7 +23,7 @@ try:
 except ImportError:
     install_requires.append('argparse')
 
-version = '1.0.0'
+version = '1.0.1'
 
 should_install_cli = os.environ.get('WIFI_INSTALL_CLI') not in ['False', '0']
 command_name = os.environ.get('WIFI_CLI_NAME', 'wifi')
