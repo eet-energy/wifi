@@ -30,13 +30,15 @@ class Cell(object):
         return 'Cell(ssid={ssid})'.format(**vars(self))
 
     @classmethod
-    def all(cls, interface):
+    def all(cls, interface, ap_force=True):
         """
         Returns a list of all cells extracted from the output of iwlist.
         """
+        command = ['iw', 'dev', interface, 'scan']
+        if ap_force:
+            command.append('ap-force')
         try:
-            iwlist_scan = subprocess.check_output(['/usr/sbin/iw', 'dev', interface, 'scan', 'ap-force'],
-                                                  stderr=subprocess.STDOUT)
+            iwlist_scan = subprocess.check_output(command, stderr=subprocess.STDOUT)
         except subprocess.CalledProcessError as e:
             raise InterfaceError(e.output.strip())
         else:
@@ -69,7 +71,8 @@ quality_re_dict = {'dBm': re.compile(r'Quality[=:](?P<quality>\d+/\d+).*Signal l
 frequency_re = re.compile(r'^(?P<frequency>[\d\.]+ .Hz)(?:[\s\(]+Channel\s+(?P<channel>\d+)[\s\)]+)?$')
 
 
-identity = lambda x: x
+def identity(x): return x
+
 
 key_translations = {
     'encryption key': 'encrypted',
@@ -83,6 +86,7 @@ def normalize_key(key):
     key = key_translations.get(key, key)
 
     return key.replace(' ', '')
+
 
 normalize_value = {
     'ssid': lambda v: v.strip('"'),
