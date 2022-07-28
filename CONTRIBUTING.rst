@@ -40,7 +40,7 @@ How to Submit a Pull Request
     possible (ignore E501, the line lengths requirement).
 
 6.  Get on GitHub and submit a pull request.
-    
+
 The best pull requests will not have PEP8 errors and will include tests.  If
 you don't have tests, I am still willing to accept the pull request, but it may
 take a while for me to merge it as I would want to write the tests myself and I

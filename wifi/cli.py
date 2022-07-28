@@ -1,5 +1,4 @@
 #!/usr/bin/python
-from __future__ import print_function
 
 import argparse
 import os
@@ -21,7 +20,7 @@ def fuzzy_find_cell(interface, query):
 
     matches = Cell.where(interface, match_partial)
 
-    num_unique_matches = len(set(cell.ssid for cell in matches))
+    num_unique_matches = len({cell.ssid for cell in matches})
     assert num_unique_matches > 0, "Couldn't find a network that matches '{}'".format(query)
     assert num_unique_matches < 2, "Found more than one network that matches '{}'".format(query)
 
@@ -85,13 +84,13 @@ def connect_command(args):
             adhoc_scheme.save()
         except AssertionError:
             pass
-        except IOError:
-            assert False, "Can't write on {0!r}, do you have required privileges?".format(args.file)
+        except OSError:
+            assert False, "Can't write on {!r}, do you have required privileges?".format(args.file)
 
         scheme = scheme_class.for_cell(*get_scheme_params(args.interface, "adhoc", args.scheme))
     else:
         scheme = scheme_class.find(args.interface, args.scheme)
-        assert scheme, "Couldn't find a scheme named {0!r}, did you mean to use -a?".format(args.scheme)
+        assert scheme, "Couldn't find a scheme named {!r}, did you mean to use -a?".format(args.scheme)
 
     try:
         scheme.activate()

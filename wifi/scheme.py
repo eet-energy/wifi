@@ -58,7 +58,7 @@ def configuration(cell, passkey=None):
 bound_ip_re = re.compile(r"^bound to (?P<ip_address>\S+)", flags=re.MULTILINE)
 
 
-class Scheme(object):
+class Scheme:
     """
     Saved configuration for connecting to a wireless network.  This
     class provides a Python interface to the /etc/network/interfaces
@@ -105,7 +105,7 @@ class Scheme(object):
         Returns an generator of saved schemes.
         """
         ensure_file_exists(cls.interfaces)
-        with open(cls.interfaces, "r") as f:
+        with open(cls.interfaces) as f:
             return extract_schemes(f.read(), scheme_class=cls)
 
     @classmethod
@@ -145,9 +145,9 @@ class Scheme(object):
         """
         Deletes the configuration from the :attr:`interfaces` file.
         """
-        iface = "iface %s-%s inet dhcp" % (self.interface, self.name)
+        iface = "iface {}-{} inet dhcp".format(self.interface, self.name)
         content = ""
-        with open(self.interfaces, "r") as f:
+        with open(self.interfaces) as f:
             skip = False
             for line in f:
                 if not line.strip():
@@ -161,7 +161,7 @@ class Scheme(object):
 
     @property
     def iface(self):
-        return "{0}-{1}".format(self.interface, self.name)
+        return "{}-{}".format(self.interface, self.name)
 
     def as_args(self):
         args = list(itertools.chain.from_iterable(("-o", "{k}={v}".format(k=k, v=v)) for k, v in self.options.items()))
@@ -187,7 +187,7 @@ class Scheme(object):
             raise ConnectionError("Failed to connect to %r" % self)
 
 
-class Connection(object):
+class Connection:
     """
     The connection object returned when connecting to a Scheme.
     """

@@ -1,5 +1,3 @@
-from __future__ import division
-
 import re
 import textwrap
 
@@ -8,7 +6,7 @@ from wifi.exceptions import InterfaceError
 from wifi.utils import db2dbm
 
 
-class Cell(object):
+class Cell:
     """
     Presents a Python interface to the output of iwlist.
     """
