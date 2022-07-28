@@ -3,7 +3,7 @@ style = ["github://MrP01/lint-me-now/nitpick-base-style.toml", "github://MrP01/l
 
 [tool.poetry]
 name = "wifi-ap-force"
-version = "1.0.2"
+version = "1.0.3"
 description = "Command line tool and library wrappers around iwlist and /etc/network/interfaces."
 authors = ["Rocky Meza", "Gavin Wahl", "EET"]
 license = "BSD"
