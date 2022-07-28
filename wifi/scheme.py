@@ -1,10 +1,11 @@
-import re
 import itertools
+import re
+
+from pbkdf2 import PBKDF2
 
 import wifi.subprocess_compat as subprocess
-from pbkdf2 import PBKDF2
-from wifi.utils import ensure_file_exists
 from wifi.exceptions import ConnectionError
+from wifi.utils import ensure_file_exists
 
 
 def configuration(cell, passkey=None):
@@ -15,20 +16,20 @@ def configuration(cell, passkey=None):
     """
     if not cell.encrypted:
         return {
-            'wireless-essid': cell.ssid,
-            'wireless-channel': 'auto',
+            "wireless-essid": cell.ssid,
+            "wireless-channel": "auto",
         }
     else:
-        if cell.encryption_type.startswith('wpa'):
+        if cell.encryption_type.startswith("wpa"):
             if len(passkey) != 64:
                 passkey = PBKDF2(passkey, cell.ssid, 4096).hexread(32)
 
             return {
-                'wpa-ssid': cell.ssid,
-                'wpa-psk': passkey,
-                'wireless-channel': 'auto',
+                "wpa-ssid": cell.ssid,
+                "wpa-psk": passkey,
+                "wireless-channel": "auto",
             }
-        elif cell.encryption_type == 'wep':
+        elif cell.encryption_type == "wep":
             # Pass key lengths in bytes for WEP depend on type of key and key length:
             #
             #       64bit   128bit   152bit   256bit
@@ -47,14 +48,14 @@ def configuration(cell, passkey=None):
                 passkey = "s:" + passkey
 
             return {
-                'wireless-essid': cell.ssid,
-                'wireless-key': passkey,
+                "wireless-essid": cell.ssid,
+                "wireless-key": passkey,
             }
         else:
             raise NotImplementedError
 
 
-bound_ip_re = re.compile(r'^bound to (?P<ip_address>\S+)', flags=re.MULTILINE)
+bound_ip_re = re.compile(r"^bound to (?P<ip_address>\S+)", flags=re.MULTILINE)
 
 
 class Scheme(object):
@@ -64,7 +65,7 @@ class Scheme(object):
     file.
     """
 
-    interfaces = '/etc/network/interfaces'
+    interfaces = "/etc/network/interfaces"
 
     @classmethod
     def for_file(cls, interfaces):
@@ -73,9 +74,13 @@ class Scheme(object):
         that you want to use.  Use this instead of directly overwriting the
         interfaces Class attribute if you care about thread safety.
         """
-        return type(cls)(cls.__name__, (cls,), {
-            'interfaces': interfaces,
-        })
+        return type(cls)(
+            cls.__name__,
+            (cls,),
+            {
+                "interfaces": interfaces,
+            },
+        )
 
     def __init__(self, interface, name, options=None):
         self.interface = interface
@@ -88,11 +93,11 @@ class Scheme(object):
         in the /etc/network/interfaces file.
         """
         iface = "iface {interface}-{name} inet dhcp".format(**vars(self))
-        options = ''.join("\n    {k} {v}".format(k=k, v=v) for k, v in self.options.items())
-        return iface + options + '\n'
+        options = "".join("\n    {k} {v}".format(k=k, v=v) for k, v in self.options.items())
+        return iface + options + "\n"
 
     def __repr__(self):
-        return 'Scheme(interface={interface!r}, name={name!r}, options={options!r}'.format(**vars(self))
+        return "Scheme(interface={interface!r}, name={name!r}, options={options!r}".format(**vars(self))
 
     @classmethod
     def all(cls):
@@ -100,7 +105,7 @@ class Scheme(object):
         Returns an generator of saved schemes.
         """
         ensure_file_exists(cls.interfaces)
-        with open(cls.interfaces, 'r') as f:
+        with open(cls.interfaces, "r") as f:
             return extract_schemes(f.read(), scheme_class=cls)
 
     @classmethod
@@ -132,8 +137,8 @@ class Scheme(object):
         """
         assert not self.find(self.interface, self.name), "This scheme already exists"
 
-        with open(self.interfaces, 'a') as f:
-            f.write('\n')
+        with open(self.interfaces, "a") as f:
+            f.write("\n")
             f.write(str(self))
 
     def delete(self):
@@ -141,8 +146,8 @@ class Scheme(object):
         Deletes the configuration from the :attr:`interfaces` file.
         """
         iface = "iface %s-%s inet dhcp" % (self.interface, self.name)
-        content = ''
-        with open(self.interfaces, 'r') as f:
+        content = ""
+        with open(self.interfaces, "r") as f:
             skip = False
             for line in f:
                 if not line.strip():
@@ -151,34 +156,33 @@ class Scheme(object):
                     skip = True
                 if not skip:
                     content += line
-        with open(self.interfaces, 'w') as f:
+        with open(self.interfaces, "w") as f:
             f.write(content)
 
     @property
     def iface(self):
-        return '{0}-{1}'.format(self.interface, self.name)
+        return "{0}-{1}".format(self.interface, self.name)
 
     def as_args(self):
-        args = list(itertools.chain.from_iterable(
-            ('-o', '{k}={v}'.format(k=k, v=v)) for k, v in self.options.items()))
+        args = list(itertools.chain.from_iterable(("-o", "{k}={v}".format(k=k, v=v)) for k, v in self.options.items()))
 
-        return [self.interface + '=' + self.iface] + args
+        return [self.interface + "=" + self.iface] + args
 
     def activate(self):
         """
         Connects to the network as configured in this scheme.
         """
 
-        subprocess.check_output(['/sbin/ifdown', self.interface], stderr=subprocess.STDOUT)
-        ifup_output = subprocess.check_output(['/sbin/ifup'] + self.as_args(), stderr=subprocess.STDOUT)
-        ifup_output = ifup_output.decode('utf-8')
+        subprocess.check_output(["/sbin/ifdown", self.interface], stderr=subprocess.STDOUT)
+        ifup_output = subprocess.check_output(["/sbin/ifup"] + self.as_args(), stderr=subprocess.STDOUT)
+        ifup_output = ifup_output.decode("utf-8")
 
         return self.parse_ifup_output(ifup_output)
 
     def parse_ifup_output(self, output):
         matches = bound_ip_re.search(output)
         if matches:
-            return Connection(scheme=self, ip_address=matches.group('ip_address'))
+            return Connection(scheme=self, ip_address=matches.group("ip_address"))
         else:
             raise ConnectionError("Failed to connect to %r" % self)
 
@@ -187,12 +191,13 @@ class Connection(object):
     """
     The connection object returned when connecting to a Scheme.
     """
+
     def __init__(self, scheme, ip_address):
         self.scheme = scheme
         self.ip_address = ip_address
 
 
-scheme_re = re.compile(r'iface\s+(?P<interface>[^-]+)(?:-(?P<name>\S+))?')
+scheme_re = re.compile(r"iface\s+(?P<interface>[^-]+)(?:-(?P<name>\S+))?")
 
 
 def extract_schemes(interfaces, scheme_class=Scheme):
@@ -200,7 +205,7 @@ def extract_schemes(interfaces, scheme_class=Scheme):
     while lines:
         line = lines.pop(0)
 
-        if line.startswith('#') or not line:
+        if line.startswith("#") or not line:
             continue
 
         match = scheme_re.match(line)
@@ -211,8 +216,8 @@ def extract_schemes(interfaces, scheme_class=Scheme):
             if not scheme or not interface:
                 continue
 
-            while lines and lines[0].startswith(' '):
-                key, value = re.sub(r'\s{2,}', ' ', lines.pop(0).strip()).split(' ', 1)
+            while lines and lines[0].startswith(" "):
+                key, value = re.sub(r"\s{2,}", " ", lines.pop(0).strip()).split(" ", 1)
                 options[key] = value
 
             scheme = scheme_class(interface, scheme, options)

@@ -1,10 +1,9 @@
-from __future__ import print_function, unicode_literals, division
+from __future__ import division, print_function, unicode_literals
 
 import os
 import sys
 
-
-if sys.version < '3':
+if sys.version < "3":
     str = unicode
 
 
@@ -23,18 +22,18 @@ def match(needle, haystack):
             j += 1
         if j >= len(haystack):
             return 0
-        score += 1 / (last_match + 1.)
+        score += 1 / (last_match + 1.0)
         last_match = j
         j += 1
     return score
 
 
-def print_table(matrix, sep='  ', file=sys.stdout, *args, **kwargs):
+def print_table(matrix, sep="  ", file=sys.stdout, *args, **kwargs):
     """
     Prints a left-aligned table of elements.
     """
     lengths = [max(map(len, map(str, column))) for column in zip(*matrix)]
-    format = sep.join('{{{0}:<{1}}}'.format(i, length) for i, length in enumerate(lengths))
+    format = sep.join("{{{0}:<{1}}}".format(i, length) for i, length in enumerate(lengths))
 
     for row in matrix:
         print(format.format(*row).strip(), file=file, *args, **kwargs)
@@ -54,4 +53,4 @@ def ensure_file_exists(filename):
     http://stackoverflow.com/a/12654798/1013960
     """
     if not os.path.exists(filename):
-        open(filename, 'a').close()
+        open(filename, "a").close()
