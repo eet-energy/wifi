@@ -5,10 +5,23 @@ style = ["github://MrP01/lint-me-now/nitpick-base-style.toml", "github://MrP01/l
 name = "wifi-ap-force"
 version = "1.0.2"
 description = "Command line tool and library wrappers around iwlist and /etc/network/interfaces."
-authors = ["Rocky Meza, Gavin Wahl, EET"]
+authors = ["Rocky Meza", "Gavin Wahl", "EET"]
 license = "BSD"
 readme = "README.md"
-packages = [{ include = "wifi_ap_force" }]
+packages = [{ include = "wifi" }]
+classifiers = [
+  "License :: OSI Approved :: BSD License",
+  "Topic :: System :: Networking",
+  "Operating System :: POSIX :: Linux",
+  "Environment :: Console",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 2.6",
+  "Programming Language :: Python :: 2.7",
+  "Programming Language :: Python :: 3.3",
+  "Programming Language :: Python :: 3.5",
+  "Programming Language :: Python :: 3.6",
+  "Programming Language :: Python :: 3.8",
+]
 
 [tool.poetry.dependencies]
 python = "^3.6"
